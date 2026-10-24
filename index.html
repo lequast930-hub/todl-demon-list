@@ -1,0 +1,216 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TODL | The Official Demon List</title>
+<style>
+:root {
+  --bg: #090914;
+  --panel: #15152a;
+  --purple: #a855f7;
+  --text: #f5f3ff;
+  --muted: #aaa5c0;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: Arial, sans-serif;
+}
+header {
+  text-align: center;
+  padding: 30px 15px;
+  background: linear-gradient(135deg, #321064, #10102b, #071b35);
+  border-bottom: 2px solid var(--purple);
+}
+header h1 {
+  margin: 0;
+  font-size: clamp(36px, 8vw, 58px);
+  color: #d8b4fe;
+  letter-spacing: 3px;
+}
+header p { color: #d5cce9; }
+nav {
+  display: flex;
+  justify-content: center;
+  gap: 18px;
+  flex-wrap: wrap;
+  padding: 14px;
+  background: #111122;
+}
+a { color: #d8b4fe; text-decoration: none; }
+main { max-width: 850px; margin: auto; padding: 20px; }
+h2 { color: #c084fc; }
+input, button {
+  font: inherit;
+  border-radius: 8px;
+  padding: 12px;
+}
+input {
+  width: 100%;
+  background: #17172b;
+  border: 1px solid #393653;
+  color: white;
+  margin: 8px 0 18px;
+}
+.level {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 15px;
+  margin: 12px 0;
+  background: var(--panel);
+  border: 1px solid #30274a;
+  border-radius: 12px;
+}
+.rank {
+  min-width: 42px;
+  font-size: 22px;
+  font-weight: bold;
+  color: #c084fc;
+}
+.details { flex: 1; min-width: 0; }
+.details h3 { margin: 0 0 6px; }
+.details p { margin: 0; color: var(--muted); font-size: 14px; }
+.vote {
+  background: #292143;
+  color: white;
+  border: 1px solid #6b3c91;
+  cursor: pointer;
+}
+.vote:active { background: #7040a0; }
+button.primary {
+  background: var(--purple);
+  color: white;
+  border: 0;
+  cursor: pointer;
+  font-weight: bold;
+}
+section {
+  background: #111120;
+  padding: 18px;
+  margin: 24px 0;
+  border-radius: 12px;
+}
+footer {
+  text-align: center;
+  color: var(--muted);
+  padding: 25px;
+  border-top: 1px solid #30274a;
+}
+.small { font-size: 13px; color: var(--muted); }
+@media(max-width: 480px) {
+  .level { gap: 9px; padding: 10px; }
+  .rank { min-width: 28px; font-size: 18px; }
+  .vote { padding: 9px; }
+}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>TODL</h1>
+  <p>The Official Demon List</p>
+  <p>Ranking the hardest Extreme Demons.</p>
+</header>
+
+<nav>
+  <a href="#rankings">Rankings</a>
+  <a href="#submit">Submit Record</a>
+  <a href="admin.html">Owner Panel</a>
+</nav>
+
+<main>
+  <section>
+    <h2>Welcome to TODL</h2>
+    <p>A community for players pushing the limits of Geometry Dash.</p>
+    <p class="small">
+      Demo version: rankings and votes on this page are stored only
+      in this browser. They are not official shared rankings.
+    </p>
+  </section>
+
+  <div id="rankings">
+    <h2>Extreme Demon Rankings</h2>
+    <input id="search" type="search"
+      placeholder="Search for a level or creator..."
+      oninput="renderLevels()">
+    <div id="levelList"></div>
+  </div>
+
+  <section id="submit">
+    <h2>Submit a Completion Record</h2>
+    <p>Send your progress and video proof for review.</p>
+    <p>
+      <a href="submit.html">Open the record submission page →</a>
+    </p>
+  </section>
+</main>
+
+<footer>
+  TODL — The Official Demon List<br>
+  <span class="small">An independent community project.</span>
+</footer>
+
+<script>
+const levels = [
+  { name: "Example Level 1", creator: "Replace with real level", rank: 1 },
+  { name: "Example Level 2", creator: "Replace with real level", rank: 2 },
+  { name: "Example Level 3", creator: "Replace with real level", rank: 3 },
+  { name: "Example Level 4", creator: "Replace with real level", rank: 4 },
+  { name: "Example Level 5", creator: "Replace with real level", rank: 5 }
+];
+
+function renderLevels() {
+  const query = document.getElementById("search").value.toLowerCase();
+  const list = document.getElementById("levelList");
+  list.innerHTML = "";
+
+  levels
+    .filter(level =>
+      level.name.toLowerCase().includes(query) ||
+      level.creator.toLowerCase().includes(query)
+    )
+    .forEach(level => {
+      const card = document.createElement("div");
+      card.className = "level";
+
+      const rank = document.createElement("div");
+      rank.className = "rank";
+      rank.textContent = "#" + level.rank;
+
+      const details = document.createElement("div");
+      details.className = "details";
+
+      const title = document.createElement("h3");
+      title.textContent = level.name;
+
+      const creator = document.createElement("p");
+      creator.textContent = "By " + level.creator;
+
+      details.append(title, creator);
+
+      const votes = document.createElement("button");
+      votes.className = "vote";
+      votes.textContent = "▲ " +
+        (Number(localStorage.getItem("todl_vote_" + level.rank)) || 0);
+
+      votes.onclick = () => {
+        const key = "todl_vote_" + level.rank;
+        const next = (Number(localStorage.getItem(key)) || 0) + 1;
+        localStorage.setItem(key, next);
+        renderLevels();
+      };
+
+      card.append(rank, details, votes);
+      list.appendChild(card);
+    });
+}
+
+renderLevels();
+</script>
+</body>
+</html>
